@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-export const connectDb = () => {
-    mongoose.connect('mongodb+srv://afrigames123:7X3DL7Rxm13OUNNx@cluster0.s8us6bg.mongodb.net/ClassRoom?retryWrites=true&w=majority&appName=Cluster0', {
+export const connectDb = (ConnString) => {
+    mongoose.connect(ConnString, {
     //   useNewUrlParser: true,
     //   useUnifiedTopology: true
     })

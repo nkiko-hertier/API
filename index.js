@@ -1,15 +1,18 @@
 import express from "express";
-import router from "./src/routes/main.js";
-import { connectDb } from "./src/db.conf.js";
+import { Routes, Connect } from "cruddy-cat";
+import * as schema from "./schema.js";
 
-connectDb();
+// connect to mongodb
+Connect('mongodb+srv://afrigames123:7X3DL7Rxm13OUNNx@cluster0.s8us6bg.mongodb.net/ClassRoom?retryWrites=true&w=majority&appName=Cluster0');
 
-const app = express()
+// initialize your app
+const app = express();
+app.use(express.json());
 
-app.use(express.json())
-app.use('/api', router)
+// initialize routes on api
+app.use('/api', Routes(schema).router());
 
-
+// run the server
 app.listen(3000, ()=>{
     console.log('Running your app at port 3000')
 })

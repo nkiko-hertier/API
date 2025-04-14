@@ -1,32 +1,83 @@
-import * as schema from "./schema.js";
+export class Controller {
+  constructor(schema) {
+    this.schema = schema;
+  }
 
-// Create a new document
-export const Create = async (model, data) => {
-  if (!schema[model]) return 0;
-  const item = new schema[model](data);
-  return await item.save();
-};
+  create() {
+    return async (req, res) => {
+      const model = this.schema[req.params.model];
+      if (!model) return res.status(400).send("Invalid model");
 
-// Read documents (all or by filter)
-export const Read = async (model, filter = {}) => {
-  if (!schema[model]) return 0;
-  return await schema[model].find(filter);
-};
+      try {
+        const item = new model(req.body);
+        const saved = await item.save();
+        res.status(201).json(saved);
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    };
+  }
 
-// Read one by ID
-export const ReadOne = async (model, id) => {
-  if (!schema[model]) return 0;
-  return await schema[model].findById(id);
-};
+  read() {
+    return async (req, res) => {
+      const model = this.schema[req.params.model];
+      if (!model) return res.status(400).send("Invalid model");
 
-// Update document by ID
-export const Update = async (model, data, id) => {
-  if (!schema[model]) return 0;
-  return await schema[model].findByIdAndUpdate(id, data, { new: true });
-};
+      try {
+        const items = await model.find(req.query);
+        res.status(200).json(items);
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    };
+  }
 
-// Delete document by ID
-export const Delete = async (model, id) => {
-  if (!schema[model]) return 0;
-  return await schema[model].findByIdAndDelete(id);
-};
+  readOne() {
+    return async (req, res) => {
+      const model = this.schema[req.params.model];
+      if (!model) return res.status(400).send("Invalid model");
+
+      try {
+        const item = await model.findById(req.params.id);
+        if (!item) return res.status(404).send("Not found");
+        res.status(200).json(item);
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    };
+  }
+
+  update() {
+    return async (req, res) => {
+      const model = this.schema[req.params.model];
+      if (!model) return res.status(400).send("Invalid model");
+
+      try {
+        const updated = await model.findByIdAndUpdate(
+          req.params.id,
+          req.body,
+          { new: true }
+        );
+        if (!updated) return res.status(404).send("Not found");
+        res.status(200).json(updated);
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    };
+  }
+
+  delete() {
+    return async (req, res) => {
+      const model = this.schema[req.params.model];
+      if (!model) return res.status(400).send("Invalid model");
+
+      try {
+        const deleted = await model.findByIdAndDelete(req.params.id);
+        if (!deleted) return res.status(404).send("Not found");
+        res.status(200).json(deleted);
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    };
+  }
+}
